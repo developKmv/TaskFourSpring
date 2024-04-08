@@ -1,0 +1,5 @@
+user1;Ivan Ivanov Ivanovich;app1
+user2;Petea Pety Petushok;app2
+user3;max maximov Maximovich;app3
+user4;Zhenya zhehyok Zhendos;app4
+user5;Valentian Valya Valusha;app5
