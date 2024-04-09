@@ -4,3 +4,4 @@
 <p>Проверки находятсья в TaskFourSpring\src\main\java\ru\study\inspects</p>
 <p>Данные для загрузки в БД TaskFourSpring\src\test\resources\data_files\data.txt</p>
 <p>Лог пишется в фаил TaskFourSpring\src\test\resources\data_files\log.txt. Лог дописывает данные в конец файла.</p>
+<p>Для логгирования использовал proxy класс TaskFourSpring\src\main\java\ru\study\utils\CheckDataProxy.java</p>
