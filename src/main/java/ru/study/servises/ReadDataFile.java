@@ -12,8 +12,10 @@ import java.util.Scanner;
 @Qualifier("file_source")
 public class ReadDataFile implements ReadData{
     private String filePath;
+    private File file;
     public ReadDataFile(@Value("src/test/resources/data_files/data.txt")String filePath){
         this.filePath = filePath;
+        this.file = new File(filePath);
     };
 
     @Override
@@ -21,7 +23,7 @@ public class ReadDataFile implements ReadData{
         ArrayList<String> result = new ArrayList<>();
         Scanner scanner = null;
         try {
-            scanner = new Scanner(new File(filePath));
+            scanner = new Scanner(file);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -31,5 +33,9 @@ public class ReadDataFile implements ReadData{
         }
         scanner.close();
         return result.toArray(new String[result.size()]);
+    }
+
+    public String getFileName(){
+     return file.getName();
     }
 }
