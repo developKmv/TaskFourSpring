@@ -1,7 +1,6 @@
 package ru.study;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,16 +11,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import ru.study.entity.Logins;
-import ru.study.inspects.CheckData;
-import ru.study.inspects.CheckDataImpl;
+import ru.study.inspects.*;
 import ru.study.repository.LoginsRepository;
-import ru.study.repository.UserRepository;
-import ru.study.entity.User;
 import ru.study.servises.ReadDataFile;
+import ru.study.servises.WriteDataBase;
 import ru.study.servises.WriteDataFile;
 import ru.study.utils.CheckDataProxy;
-import ru.study.utils.MyUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @SpringBootTest()
@@ -49,50 +47,44 @@ public class TestsApp {
         registry.add("spring.datasource.password", postgres::getPassword);
         log.info("password: " + postgres.getPassword());
     }
-
-    @Autowired
-    UserRepository userRepository;
     @Autowired
     LoginsRepository loginsRepository;
+    @Autowired
+    WriteDataBase writeDataBase;
     @Autowired
     @Qualifier("file_source")
     ReadDataFile readDataFile;
     @Autowired
     WriteDataFile writeDataFile;
-
-    @Autowired
-    @Qualifier("checkDataImp")
-    CheckData checkData;
-    @Autowired
-    CheckDataProxy checkDataProxy;
     @Test
     public void tst() throws InterruptedException {
-        CheckData proxy = (CheckData) checkDataProxy.proxy(checkData,writeDataFile);
+        List<CheckData> inspects = new ArrayList<>();
+
+        CheckData checkDataFIO = new CheckDataFIO();
+        CheckDataProxy checkDataProxy = new CheckDataProxy<CheckData>(checkDataFIO,writeDataFile);
+        inspects.add((CheckData) checkDataProxy.proxy(checkDataFIO,writeDataFile));
+
+        CheckData checkDataApp = new CheckDataApp();
+        checkDataProxy = new CheckDataProxy<CheckData>(checkDataApp,writeDataFile);
+        inspects.add((CheckData) checkDataProxy.proxy(checkDataApp,writeDataFile));
+
+        CheckData checkDataDate = new CheckDataDate();
+        checkDataProxy = new CheckDataProxy<CheckData>(checkDataDate,writeDataFile);
+        inspects.add((CheckData) checkDataProxy.proxy(checkDataDate,writeDataFile));
 
         for (String s : readDataFile.read()) {
 
             String arrData[] = s.split(";");
-            User user = new User(null, arrData[0], proxy.checkAndChangeUpper(arrData[1]));
-
-            userRepository.save(user);
-            //checkDate exist
-            if (proxy.checkExistDate(arrData[2], s, readDataFile.getFileName(), writeDataFile) == true) {
-                userRepository.save(user);
-                Logins logins = new Logins(null, proxy.createDate(arrData[2]),
-                        proxy.checkApplicationName(arrData[3].substring(0, MyUtils.extraCharacterIndex(arrData[3]))),
-                        user);
-                loginsRepository.save(logins);
-            }
-
+            writeDataBase.write(arrData[0].trim(),arrData[1].trim(),arrData[2].trim(),arrData[3].trim(),inspects,writeDataFile,readDataFile.getFileName());
 
         }
 
         //checkLowerCase
-        Assert.assertNotEquals("max maximov Maximovich", userRepository.findById(3).get().getFio());
+        Assert.assertNotEquals("max maximov Maximovich", checkDataFIO.check("max maximov Maximovich"));
         //checkApplicationName
-        Assert.assertNotEquals("app", loginsRepository.findById(4).get().getApplication());
+        Assert.assertNotEquals("app", checkDataApp.check("app"));
         //checkDate exist
-        Assert.assertEquals("", readDataFile.read()[3].split(";")[2]);
+        Assert.assertEquals("null", checkDataDate.check(""));
 
         System.out.println(loginsRepository.findById(1));
         System.out.println(loginsRepository.findById(2));

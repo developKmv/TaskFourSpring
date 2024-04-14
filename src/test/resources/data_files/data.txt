@@ -1,5 +1,5 @@
 user1;Ivan Ivanov Ivanovich;01-04-2024;web
 user2;Petea Pety Petushok;01-01-2024;mobile
 user3;max maximov Maximovich;11-03-2020;app3
-user4;Zhenya zhehyok Zhendos;;web
-user5;Valentian Valya Valusha;01-11-2020;app5
+user4;Zhenya zhehyok Zhendos;1-11-2020;web
+user5;Valentian Valya Valusha;;app5

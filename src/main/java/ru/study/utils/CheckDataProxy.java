@@ -13,12 +13,11 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Date;
 
-@Component
 public class CheckDataProxy<T> implements InvocationHandler{
     private WriteDataFile writeDataFile;
     private T o;
-    @Autowired
-    public CheckDataProxy(@Qualifier("checkDataImp")T o,WriteDataFile writeDataFile) {
+
+    public CheckDataProxy(T o,WriteDataFile writeDataFile) {
         this.o = o;
         this.writeDataFile = writeDataFile;
     }
